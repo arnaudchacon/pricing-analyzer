@@ -502,7 +502,7 @@ with tab5:
             go.Bar(
                 x=forecast_labels, y=forecast["projected_count"],
                 name="Projected Volume",
-                marker=dict(color=NVIDIA_GREEN, opacity=0.3, line=dict(dash="dash", width=1, color=NVIDIA_GREEN)),
+                marker=dict(color=NVIDIA_GREEN, opacity=0.3, line=dict(width=1, color=NVIDIA_GREEN)),
                 hovertemplate="<b>%{x}</b><br>Projected: %{y}<extra></extra>",
             ),
             secondary_y=False,
