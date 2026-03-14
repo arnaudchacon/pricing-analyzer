@@ -110,9 +110,8 @@ def duration_analysis(df, sla_hours=SLA_HOURS):
 
     # SLA breach by reason
     resolved = df[df["hold_status"] == "Resolved"].copy()
-    breach_by_reason = resolved.groupby("hold_reason").apply(
-        lambda x: (x["hold_duration_hours"] > sla_hours).sum() / max(len(x), 1) * 100
-    ).round(1).reset_index()
+    resolved["_breached"] = (resolved["hold_duration_hours"] > sla_hours).astype(int)
+    breach_by_reason = resolved.groupby("hold_reason")["_breached"].mean().mul(100).round(1).reset_index()
     breach_by_reason.columns = ["hold_reason", "sla_breach_pct"]
 
     # Daily trend
@@ -187,10 +186,9 @@ def region_bu_analysis(df, sla_hours=SLA_HOURS):
         total_hours=("hold_duration_hours", "sum"),
     ).reset_index()
 
-    resolved = df[df["hold_status"] == "Resolved"]
-    bu_breach = resolved.groupby("business_unit").apply(
-        lambda x: round((x["hold_duration_hours"] > sla_hours).sum() / max(len(x), 1) * 100, 1)
-    ).reset_index()
+    resolved = df[df["hold_status"] == "Resolved"].copy()
+    resolved["_breached"] = (resolved["hold_duration_hours"] > sla_hours).astype(int)
+    bu_breach = resolved.groupby("business_unit")["_breached"].mean().mul(100).round(1).reset_index()
     bu_breach.columns = ["business_unit", "sla_breach_pct"]
     bu_stats = bu_stats.merge(bu_breach, on="business_unit", how="left")
     bu_stats["avg_duration"] = bu_stats["avg_duration"].round(1)
